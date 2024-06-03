@@ -1,55 +1,61 @@
-import fs from 'fs'
-import path from 'path';
-export const ModelGeneratorController = {
-    generateDjangoModel: (req, res) => {
 
+import path from 'path';
+import writeFile from "../files/writeInFile.js";
+let numberOfFile = 0;
+
+const typeMappingExpress = {
+    'string': 'String',
+    'integer': 'Number',
+    'boolean': 'Boolean',
+    'date': 'Date',
+    'datetime': 'Date',
+};
+const typeMappingDjango = {
+    'boolean': 'BooleanField()',
+    'datetime': 'DateTimeField()',
+    'date': 'DateField()',
+    'string': 'CharField(max_length=50)',
+    'integer': 'IntegerField()',
+};
+export const ModelGeneratorController = {
+    generateDjangoModel: async (req, res) => {
+        const { name, variables } = req.body;
+        numberOfFile++;
+
+        const filePath = `./outmodels/${numberOfFile}.py`;
+        const basicImports = `from django.db import models\n\n`;
+
+        await writeFile(filePath, basicImports);
+        await writeFile(filePath, `class ${name}(models.Model):\n`);
+
+        for (let key in variables) {
+            let fieldType = typeMappingDjango[variables[key].type.toLowerCase()] || 'TextField()';
+            let data = `    ${variables[key].name} = models.${fieldType}\n`;
+            await writeFile(filePath, data);
+        }
+
+        await writeFile(filePath, '\n');
+        res.status(200).json({ 'response': 'success' });
     },
     generateExpressModel: async (req, res) => {
-        //todo implement the logic for generating the express model.
-        const {name, variables} = req.body
-        // console.log(`name = ${name} and variables = ${variables}`)
-        // console.log(typeof variables)
-        // console.log(name)
-
-        //todo find filename and write to it directly.
-        const basicImports = `import mongoose from "mongoose"; \n`
-        // const filePath = path.join(__dirname, '..', 'outmodels', '1.txt');
-        const filePath = "./outmodels/1.txt"
-        // const absolutePath = "C:\\Users\\DARIA TAGHVA\\Desktop\\finalproject\\backend\\outmodels\\1.txt"
-        await fs.appendFile(filePath, basicImports, (err) => {
-            if(err) throw err;
-        })
-        const defineSchema = `const someSchema = new mongoose.Schema({\n`;
-        await fs.appendFile(filePath, defineSchema, (err) => {
-            if(err) throw err;
-        })
+        const { name, variables } = req.body;
+        numberOfFile++;
+        const filePath = `./outmodels/${numberOfFile}.js`;
+        const basicImports = `import mongoose from "mongoose";\n\n`;
+        await writeFile(filePath, basicImports);
+        await writeFile(filePath, `const ${name}Schema = new mongoose.Schema({\n`);
         for (let key in variables) {
-            // console.log(key, variables[key]);
-            let data = `${variables[key].name}:${variables[key].type} \n`
-            // console.log(data)
-            await fs.appendFile(filePath, data, (err) => {
-                if(err)
-                    throw err;
-            })
-
+            let fieldType = typeMappingExpress[variables[key].type.toLowerCase()] || 'String';
+            let data = `    ${variables[key].name}: ${fieldType},\n`;
+            await writeFile(filePath, data);
         }
-        const endSchema = "})\n"
+        await writeFile(filePath, `});\n\n`);
+        await writeFile(filePath, `const ${name} = mongoose.model('${name}', ${name}Schema);\n\n`);
+        await writeFile(filePath, `export default ${name};\n`);
+        res.status(200).json({ 'response': 'success' });
 
-        await fs.appendFile(filePath, endSchema, (err) => {
-            if(err)
-                throw err;
-        })
 
-        const createModel = `export default const ${name} = mongoose.model(${name}, someSchema);`
-        await fs.appendFile(filePath, createModel, (err) => {
-            if(err)
-                throw err;
-        })
-        await res.status(200).json({'response': 'success'})
 
     },
-    generatePHPModel: (req, res) => {
-        const {name, variables} = req.body
 
-    }
 }
