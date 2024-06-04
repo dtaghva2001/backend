@@ -16,5 +16,5 @@ myRouter.post('/login', SignUpAndLoginController.login)
 
 myRouter.post('/generate_model_express', ModelGeneratorController.generateExpressModel)
 myRouter.post('/generate_model_django', ModelGeneratorController.generateDjangoModel)
-myRouter.post('/generate_model_php', ModelGeneratorController.generatePHPModel)
+// myRouter.post('/generate_model_php', ModelGeneratorController.generatePHPModel)
 export default myRouter;

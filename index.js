@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(myRouter)
 connect_database()
 
-const PORT = 1234;
+const PORT = 1235;
 
 app.listen(PORT, () => {
     console.log('app listening on port ' + PORT)

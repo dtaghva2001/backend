@@ -35,7 +35,7 @@ export const ModelGeneratorController = {
         }
 
         await writeFile(filePath, '\n');
-        res.status(200).json({ 'response': 'success' });
+        res.status(200).json({ 'response': 'success', 'modelID': numberOfFile });
     },
     generateExpressModel: async (req, res) => {
         const { name, variables } = req.body;
@@ -52,9 +52,7 @@ export const ModelGeneratorController = {
         await writeFile(filePath, `});\n\n`);
         await writeFile(filePath, `const ${name} = mongoose.model('${name}', ${name}Schema);\n\n`);
         await writeFile(filePath, `export default ${name};\n`);
-        res.status(200).json({ 'response': 'success' });
-
-
+        res.status(200).json({ 'response': 'success', 'modelID':  numberOfFile});
 
     },
 
