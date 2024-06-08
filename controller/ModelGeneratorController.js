@@ -4,6 +4,11 @@ import writeFile from "../files/writeInFile.js";
 let numberOfFile = 0;
 
 const typeMappingExpress = {
+    'رشته': 'String',
+    'عددصحیح': 'Number',
+    'تاریخ': 'Date',
+    'تاریخوزمان': 'Date',
+    'بولی': 'Boolean',
     'string': 'String',
     'integer': 'Number',
     'boolean': 'Boolean',
@@ -46,6 +51,7 @@ export const ModelGeneratorController = {
         await writeFile(filePath, `const ${name}Schema = new mongoose.Schema({\n`);
         for (let key in variables) {
             let fieldType = typeMappingExpress[variables[key].type.toLowerCase()] || 'String';
+            console.log(fieldType)
             let data = `    ${variables[key].name}: ${fieldType},\n`;
             await writeFile(filePath, data);
         }
@@ -53,7 +59,6 @@ export const ModelGeneratorController = {
         await writeFile(filePath, `const ${name} = mongoose.model('${name}', ${name}Schema);\n\n`);
         await writeFile(filePath, `export default ${name};\n`);
         res.status(200).json({ 'response': 'success', 'modelID':  numberOfFile});
-
     },
 
 }
